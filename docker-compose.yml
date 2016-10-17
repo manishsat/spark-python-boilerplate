@@ -1,0 +1,27 @@
+job:
+  build: .
+  volumes:
+    - ./src:/root/project/build/src
+    - ./test:/root/project/build/test
+  links:
+    - spark-master
+    - spark-worker
+spark-master:
+  hostname: spark-master
+  command: master
+  image: winkapp/spark-standalone:1.6.0
+  environment:
+    - SPARK_MASTER_HOST=spark-master
+  ports:
+    - "8080:8080"
+    - "7077:7077"
+    - "6066:6066"
+spark-worker:
+  command: worker
+  image: winkapp/spark-standalone:1.6.0
+  environment:
+    - SPARK_MASTER_URL=spark://spark-master:7077
+  ports:
+    - "8081"
+  links:
+    - spark-master
